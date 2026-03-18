@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cryptarithm — ACK.IBM</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">CRYPTARITHM</div>
+    <div class="question-number">ข้อที่ 1</div>
+    <p class="subtitle">จงเติมตัวเลขและคำนวณให้ผลลัพธ์ตรงกับโจทย์ข้างบน</p>
+    <h1>ACK.IBM</h1>
+  </div>
+
+  <div class="equation-box">
+    <div class="fraction">
+      <span class="num"><span class="letter">I</span></span>
+      <span class="bar"></span>
+      <span class="den"><span class="letter">M</span></span>
+    </div>
+    <span class="op">=</span>
+    <div class="fraction">
+      <span class="num"><span class="letter">B</span></span>
+      <span class="bar"></span>
+      <span class="den"><span class="letter">A</span></span>
+    </div>
+    <span class="op">+</span>
+    <div class="fraction">
+      <span class="num"><span class="letter">C</span></span>
+      <span class="bar"></span>
+      <span class="den"><span class="letter">K</span></span>
+    </div>
+  </div>
+
+  <div class="rule-box">
+    <div>
+      ใช้ตัวเลข <strong>1 ถึง 6</strong> แทน A, C, K, I, B, M &nbsp;·&nbsp; ตัวเลขแต่ละตัว <strong>ห้ามซ้ำกัน</strong>
+    </div>
+  </div>
+
+  <div class="inputs-grid">
+    <div class="input-group">
+      <label><span class="letter-label">A</span></label>
+      <input type="number" id="inp-A" min="1" max="6" placeholder="?" oninput="onInput()">
+    </div>
+    <div class="input-group">
+      <label><span class="letter-label">C</span></label>
+      <input type="number" id="inp-C" min="1" max="6" placeholder="?" oninput="onInput()">
+    </div>
+    <div class="input-group">
+      <label><span class="letter-label">K</span></label>
+      <input type="number" id="inp-K" min="1" max="6" placeholder="?" oninput="onInput()">
+    </div>
+    <div class="input-group">
+      <label><span class="letter-label">I</span></label>
+      <input type="number" id="inp-I" min="1" max="6" placeholder="?" oninput="onInput()">
+    </div>
+    <div class="input-group">
+      <label><span class="letter-label">B</span></label>
+      <input type="number" id="inp-B" min="1" max="6" placeholder="?" oninput="onInput()">
+    </div>
+    <div class="input-group">
+      <label><span class="letter-label">M</span></label>
+      <input type="number" id="inp-M" min="1" max="6" placeholder="?" oninput="onInput()">
+    </div>
+  </div>
+
+  <div class="preview-row" id="preview"></div>
+
+  <div class="btn-row">
+    <button class="btn-reset" onclick="resetGame()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+      รีเซ็ต
+    </button>
+    <button class="btn-hint" onclick="giveHint()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      คำใบ้
+    </button>
+    <button class="btn-check" onclick="checkAnswer()">
+      ตรวจคำตอบ
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Result Modal -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-icon" id="modal-icon"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">ปิด</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
