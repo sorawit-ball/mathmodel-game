@@ -1,7 +1,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Courier New', Courier, monospace;
   background: #0d0d0d;
   min-height: 100vh;
   display: flex;
