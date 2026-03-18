@@ -1,122 +1,30 @@
-// Equation: I/M = B/A + C/K  — digits 1-6, all unique
-// Answer: A=4, C=1, K=3, I=5, B=2, M=6
-// Check: 5/6 = 2/4 + 1/3 = 0.5 + 0.333... = 0.833... ✓
+// ── Shared helpers ──────────────────────────────────────────────
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+function simplify(n, d) { const g = gcd(Math.abs(n), Math.abs(d)); return [n/g, d/g]; }
+function fracStr(n, d) { const [sn,sd] = simplify(n,d); return sd===1 ? `${sn}` : `${sn}/${sd}`; }
 
-function findSolutions() {
-  const solutions = [];
-  const d = [1,2,3,4,5,6];
-  for (let I of d) for (let M of d)
-  for (let B of d) for (let A of d)
-  for (let C of d) for (let K of d) {
-    if (new Set([I,M,B,A,C,K]).size !== 6) continue;
-    if (Math.abs(I/M - (B/A + C/K)) < 1e-9)
-      solutions.push({A,C,K,I,B,M});
-  }
-  return solutions;
+function getVals(prefix, keys) {
+  return keys.reduce((acc,k) => { acc[k] = parseInt(document.getElementById(`${prefix}-${k}`).value); return acc; }, {});
 }
-
-const SOLUTIONS = findSolutions();
-
-const HINTS = [
-  "ฝั่งซ้าย I/M ต้องน้อยกว่า 1 — ลองให้ I น้อยกว่า M",
-  "ลองให้ A และ K เป็นตัวเลขที่ B/A + C/K รวมกันได้ลงตัว",
-  `มีคำตอบที่ถูกต้องทั้งหมด ${SOLUTIONS.length} ชุด`,
-  "ตัวอย่าง: ลองให้ I=5, M=6 แล้วหาค่าที่เหลือ",
-];
-
-let hintStep = 0;
-const KEYS = ['A','C','K','I','B','M'];
-
-function gcd(a,b) { return b===0 ? a : gcd(b, a%b); }
-
-function simplify(n,d) {
-  const g = gcd(Math.abs(n), Math.abs(d));
-  return [n/g, d/g];
+function clearInputs(prefix, keys) {
+  keys.forEach(k => { const el = document.getElementById(`${prefix}-${k}`); el.value=''; el.classList.remove('correct','wrong'); });
 }
-
-function fracStr(n,d) {
-  const [sn,sd] = simplify(n,d);
-  return sd===1 ? `${sn}` : `${sn}/${sd}`;
-}
-
-function getValues() {
-  return KEYS.reduce((acc,k) => {
-    acc[k] = parseInt(document.getElementById(`inp-${k}`).value);
-    return acc;
-  }, {});
-}
-
-function onInput() {
-  const v = getValues();
-  const preview = document.getElementById('preview');
-  if (KEYS.some(k => isNaN(v[k]))) { preview.textContent = ''; return; }
-  const lhs = v.I / v.M;
-  const rhs = v.B / v.A + v.C / v.K;
-  preview.textContent = `${v.I}/${v.M} = ${lhs.toFixed(4)}   |   ${v.B}/${v.A} + ${v.C}/${v.K} = ${rhs.toFixed(4)}`;
-}
-
-function checkAnswer() {
-  const v = getValues();
-  const inputs = KEYS.map(k => document.getElementById(`inp-${k}`));
-  inputs.forEach(i => i.classList.remove('correct','wrong'));
-
-  if (KEYS.some(k => isNaN(v[k])))        { showModal('error','กรุณากรอกตัวเลขให้ครบทุกช่อง',''); return; }
-  if (KEYS.some(k => v[k]<1 || v[k]>6))  { showModal('error','ตัวเลขต้องอยู่ระหว่าง 1–6 เท่านั้น',''); return; }
-  if (new Set(KEYS.map(k=>v[k])).size!==6){ showModal('error','ตัวเลขทั้ง 6 ตัวต้องไม่ซ้ำกัน',''); return; }
-
-  const lhs = v.I / v.M;
-  const rhs = v.B / v.A + v.C / v.K;
-  const correct = Math.abs(lhs - rhs) < 1e-9;
-
-  if (correct) {
-    inputs.forEach(i => i.classList.add('correct'));
-    const detail =
-      `${v.I}/${v.M}  =  ${v.B}/${v.A}  +  ${v.C}/${v.K}\n` +
-      `${fracStr(v.I,v.M)}  =  ${fracStr(v.B*v.K + v.C*v.A, v.A*v.K)}\n\n` +
-      `คำตอบ ACK.IBM = ${v.A}${v.C}${v.K}.${v.I}${v.B}${v.M}`;
-    showModal('success', 'ถูกต้อง', detail);
-    launchConfetti();
-    hintStep = 0;
-  } else {
-    inputs.forEach(i => i.classList.add('wrong'));
-
-    // LHS
-    const [ln,ld] = simplify(v.I, v.M);
-    // RHS: B/A + C/K = (B*K + C*A)/(A*K)
-    const rhsN = v.B*v.K + v.C*v.A;
-    const rhsD = v.A*v.K;
-    const [rn,rd] = simplify(rhsN, rhsD);
-
-    // Common denominator
-    const lcd = (ld*rd) / gcd(ld,rd);
-    const lCommon = `${ln*(lcd/ld)}/${lcd}`;
-    const rCommon = `${rn*(lcd/rd)}/${lcd}`;
-
-    const detail =
-      `ฝั่งซ้าย:   ${v.I}/${v.M} = ${fracStr(v.I,v.M)} = ${lCommon}\n` +
-      `ฝั่งขวา:   ${v.B}/${v.A} + ${v.C}/${v.K} = ${fracStr(rhsN,rhsD)} = ${rCommon}\n\n` +
-      `${lCommon}  ≠  ${rCommon}`;
-    showModal('error', 'ยังไม่ถูกต้อง', detail);
-  }
+function markInputs(prefix, keys, cls) {
+  keys.forEach(k => document.getElementById(`${prefix}-${k}`).classList.add(cls));
 }
 
 function showModal(type, title, body) {
-  const overlay = document.getElementById('modal');
-  const box     = document.getElementById('modal-box');
-  const iconEl  = document.getElementById('modal-icon');
-  const titleEl = document.getElementById('modal-title');
-  const bodyEl  = document.getElementById('modal-body');
-
-  iconEl.textContent  = type === 'success' ? '✓' : '✕';
-  titleEl.textContent = title;
-  titleEl.className   = `modal-title ${type}`;
-  bodyEl.textContent  = body;
+  const icons = { success:'✓', error:'✕', hint:'?', answer:'!' };
+  const colors = { success:'#16a34a', error:'#dc2626', hint:'#ff7800', answer:'#7c3aed' };
+  document.getElementById('modal-icon').textContent = icons[type] || '?';
+  document.getElementById('modal-icon').style.color = colors[type] || '#333';
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-title').className = `modal-title ${type}`;
+  const bodyEl = document.getElementById('modal-body');
+  bodyEl.textContent = body;
   bodyEl.style.display = body ? 'block' : 'none';
-
-  box.className = type === 'success' ? 'modal-box success-ring' : 'modal-box';
-  iconEl.style.color = type === 'success' ? '#16a34a' : '#dc2626';
-
-  overlay.classList.add('show');
+  document.getElementById('modal-box').className = type==='success' ? 'modal-box success-ring' : 'modal-box';
+  document.getElementById('modal').classList.add('show');
 }
 
 function closeModal(e) {
@@ -124,50 +32,214 @@ function closeModal(e) {
   document.getElementById('modal').classList.remove('show');
 }
 
-function giveHint() {
-  showModal('hint', 'คำใบ้', HINTS[Math.min(hintStep, HINTS.length-1)]);
-  hintStep = Math.min(hintStep+1, HINTS.length-1);
-}
-
-function resetGame() {
-  KEYS.forEach(k => {
-    const el = document.getElementById(`inp-${k}`);
-    el.value = '';
-    el.classList.remove('correct','wrong');
-  });
-  document.getElementById('preview').textContent = '';
-  hintStep = 0;
-}
-
-// Confetti
 function launchConfetti() {
   const canvas = document.getElementById('confetti');
   const ctx = canvas.getContext('2d');
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
   const pieces = Array.from({length:160}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * -canvas.height,
-    r: Math.random() * 7 + 3,
+    x: Math.random()*canvas.width, y: Math.random()*-canvas.height,
+    r: Math.random()*7+3,
     color: ['#ff7800','#ff9933','#16a34a','#4ecdc4','#f5a623','#e94560'][Math.floor(Math.random()*6)],
-    speed: Math.random() * 5 + 2,
-    drift: (Math.random()-0.5) * 3,
-    rot: Math.random() * Math.PI * 2,
+    speed: Math.random()*5+2, drift: (Math.random()-.5)*3, rot: Math.random()*Math.PI*2,
   }));
   let frame = 0;
   function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     pieces.forEach(p => {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*1.6);
-      ctx.restore();
-      p.y += p.speed; p.x += p.drift; p.rot += 0.05;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6); ctx.restore();
+      p.y+=p.speed; p.x+=p.drift; p.rot+=0.05;
     });
     if (++frame < 220) requestAnimationFrame(draw);
     else ctx.clearRect(0,0,canvas.width,canvas.height);
   }
   draw();
 }
+
+// ── Q1: A/B = C/D, digits 1-6, answer: A=2,B=3,C=4,D=6 ─────────
+// 2/3 = 4/6 ✓
+const Q1 = (() => {
+  const prefix = 'q1', keys = ['A','B','C','D'];
+  const answer = {A:2,B:3,C:4,D:6};
+  const hints = [
+    "A/B = C/D หมายความว่าเศษส่วนทั้งสองต้องเท่ากัน",
+    "ลองคิดว่าเศษส่วนไหนที่เท่ากันได้ เช่น 1/2 = 2/4",
+    "ตัวเลขที่ใช้ต้องอยู่ใน 1–6 และห้ามซ้ำกัน",
+    "เฉลย: A=2, B=3, C=4, D=6 → 2/3 = 4/6",
+  ];
+  let step = 0;
+
+  function preview() {
+    const v = getVals(prefix, keys);
+    const el = document.getElementById('prev1');
+    if (keys.some(k=>isNaN(v[k]))) { el.textContent=''; return; }
+    el.textContent = `${v.A}/${v.B} = ${(v.A/v.B).toFixed(4)}   |   ${v.C}/${v.D} = ${(v.C/v.D).toFixed(4)}`;
+  }
+
+  function check() {
+    const v = getVals(prefix, keys);
+    clearInputs(prefix, keys);
+    if (keys.some(k=>isNaN(v[k]))) { showModal('error','กรอกให้ครบ',''); return; }
+    if (keys.some(k=>v[k]<1||v[k]>6)) { showModal('error','ใช้ตัวเลข 1–6 เท่านั้น',''); return; }
+    if (new Set(keys.map(k=>v[k])).size!==4) { showModal('error','ตัวเลขห้ามซ้ำกัน',''); return; }
+    const ok = Math.abs(v.A/v.B - v.C/v.D) < 1e-9;
+    if (ok) {
+      markInputs(prefix,keys,'correct');
+      showModal('success','ถูกต้อง',`${v.A}/${v.B} = ${v.C}/${v.D} = ${fracStr(v.A,v.B)}`);
+      launchConfetti(); step=0;
+    } else {
+      markInputs(prefix,keys,'wrong');
+      showModal('error','ยังไม่ถูก',`${v.A}/${v.B} = ${fracStr(v.A,v.B)}\n${v.C}/${v.D} = ${fracStr(v.C,v.D)}\n${fracStr(v.A,v.B)} ≠ ${fracStr(v.C,v.D)}`);
+    }
+  }
+
+  function hint() { showModal('hint','คำใบ้',hints[Math.min(step,hints.length-1)]); step=Math.min(step+1,hints.length-1); }
+  function reveal() { showModal('answer','เฉลยข้อที่ 1','A=2, B=3, C=4, D=6\n\n2/3 = 4/6\n\nทั้งสองเศษส่วนเท่ากับ 2/3'); }
+  function reset() { clearInputs(prefix,keys); document.getElementById('prev1').textContent=''; step=0; }
+
+  return { preview, check, hint, reveal, reset };
+})();
+
+// ── Q2: A/B + C/D = E/F, digits 1-6, answer: A=1,B=2,C=5,D=6,E=4,F=3 ──
+// 1/2 + 5/6 = 4/3 ✓  (0.5 + 0.8333 = 1.3333)
+const Q2 = (() => {
+  const prefix = 'q2', keys = ['A','B','C','D','E','F'];
+  const answer = {A:1,B:2,C:5,D:6,E:4,F:3};
+  const hints = [
+    "ผลรวม A/B + C/D ต้องมากกว่า 1 เพราะ E/F > 1",
+    "ลองให้ B และ D เป็นตัวเลขที่บวกกันแล้วได้ลงตัว",
+    "ลองให้ B=2, D=6 แล้วหาค่า A, C ที่เหมาะสม",
+    "เฉลย: A=1, B=2, C=5, D=6, E=4, F=3 → 1/2 + 5/6 = 4/3",
+  ];
+  let step = 0;
+
+  function preview() {
+    const v = getVals(prefix, keys);
+    const el = document.getElementById('prev2');
+    if (keys.some(k=>isNaN(v[k]))) { el.textContent=''; return; }
+    const lhs = v.A/v.B + v.C/v.D;
+    el.textContent = `${v.A}/${v.B} + ${v.C}/${v.D} = ${lhs.toFixed(4)}   |   ${v.E}/${v.F} = ${(v.E/v.F).toFixed(4)}`;
+  }
+
+  function check() {
+    const v = getVals(prefix, keys);
+    clearInputs(prefix, keys);
+    if (keys.some(k=>isNaN(v[k]))) { showModal('error','กรอกให้ครบ',''); return; }
+    if (keys.some(k=>v[k]<1||v[k]>6)) { showModal('error','ใช้ตัวเลข 1–6 เท่านั้น',''); return; }
+    if (new Set(keys.map(k=>v[k])).size!==6) { showModal('error','ตัวเลขห้ามซ้ำกัน',''); return; }
+    const lhs = v.A/v.B + v.C/v.D;
+    const rhs = v.E/v.F;
+    const ok = Math.abs(lhs - rhs) < 1e-9;
+    if (ok) {
+      markInputs(prefix,keys,'correct');
+      showModal('success','ถูกต้อง',`${v.A}/${v.B} + ${v.C}/${v.D} = ${v.E}/${v.F}\n${lhs.toFixed(4)} = ${rhs.toFixed(4)}`);
+      launchConfetti(); step=0;
+    } else {
+      markInputs(prefix,keys,'wrong');
+      const rhsN=v.A*v.D+v.C*v.B, rhsD=v.B*v.D;
+      showModal('error','ยังไม่ถูก',
+        `ฝั่งซ้าย: ${v.A}/${v.B} + ${v.C}/${v.D} = ${fracStr(rhsN,rhsD)}\nฝั่งขวา: ${v.E}/${v.F} = ${fracStr(v.E,v.F)}\n${fracStr(rhsN,rhsD)} ≠ ${fracStr(v.E,v.F)}`);
+    }
+  }
+
+  function hint() { showModal('hint','คำใบ้',hints[Math.min(step,hints.length-1)]); step=Math.min(step+1,hints.length-1); }
+  function reveal() { showModal('answer','เฉลยข้อที่ 2','A=1, B=2, C=5, D=6, E=4, F=3\n\n1/2 + 5/6 = 4/3\n\n0.5 + 0.8333... = 1.3333...'); }
+  function reset() { clearInputs(prefix,keys); document.getElementById('prev2').textContent=''; step=0; }
+
+  return { preview, check, hint, reveal, reset };
+})();
+
+// ── Q3: I/M = B/A + C/K, digits 1-6, answer: A=4,C=1,K=3,I=5,B=2,M=6 ──
+// 5/6 = 2/4 + 1/3 ✓
+const Q3 = (() => {
+  const prefix = 'q3', keys = ['A','C','K','I','B','M'];
+  const hints = [
+    "ฝั่งซ้าย I/M ต้องน้อยกว่า 1 — ให้ I < M",
+    "ลองให้ M=6 แล้วหาค่า I ที่เหมาะสม",
+    "ถ้า I=5, M=6 แล้ว B/A + C/K ต้องเท่ากับ 5/6",
+    "เฉลย: A=4, C=1, K=3, I=5, B=2, M=6 → 5/6 = 2/4 + 1/3",
+  ];
+  let step = 0;
+
+  function preview() {
+    const v = getVals(prefix, keys);
+    const el = document.getElementById('prev3');
+    if (keys.some(k=>isNaN(v[k]))) { el.textContent=''; return; }
+    const lhs = v.I/v.M, rhs = v.B/v.A + v.C/v.K;
+    el.textContent = `${v.I}/${v.M} = ${lhs.toFixed(4)}   |   ${v.B}/${v.A} + ${v.C}/${v.K} = ${rhs.toFixed(4)}`;
+  }
+
+  function check() {
+    const v = getVals(prefix, keys);
+    clearInputs(prefix, keys);
+    if (keys.some(k=>isNaN(v[k]))) { showModal('error','กรอกให้ครบ',''); return; }
+    if (keys.some(k=>v[k]<1||v[k]>6)) { showModal('error','ใช้ตัวเลข 1–6 เท่านั้น',''); return; }
+    if (new Set(keys.map(k=>v[k])).size!==6) { showModal('error','ตัวเลขห้ามซ้ำกัน',''); return; }
+    const lhs = v.I/v.M, rhs = v.B/v.A + v.C/v.K;
+    const ok = Math.abs(lhs-rhs) < 1e-9;
+    if (ok) {
+      markInputs(prefix,keys,'correct');
+      showModal('success','ถูกต้อง',`${v.I}/${v.M} = ${v.B}/${v.A} + ${v.C}/${v.K}\n${fracStr(v.I,v.M)} = ${fracStr(v.B*v.K+v.C*v.A,v.A*v.K)}`);
+      launchConfetti(); step=0;
+    } else {
+      markInputs(prefix,keys,'wrong');
+      const [ln,ld]=simplify(v.I,v.M), rhsN=v.B*v.K+v.C*v.A, rhsD=v.A*v.K, [rn,rd]=simplify(rhsN,rhsD);
+      const lcd=(ld*rd)/gcd(ld,rd);
+      showModal('error','ยังไม่ถูก',
+        `ฝั่งซ้าย: ${v.I}/${v.M} = ${ln*(lcd/ld)}/${lcd}\nฝั่งขวา: ${v.B}/${v.A} + ${v.C}/${v.K} = ${rn*(lcd/rd)}/${lcd}\n${ln*(lcd/ld)}/${lcd} ≠ ${rn*(lcd/rd)}/${lcd}`);
+    }
+  }
+
+  function hint() { showModal('hint','คำใบ้',hints[Math.min(step,hints.length-1)]); step=Math.min(step+1,hints.length-1); }
+  function reveal() { showModal('answer','เฉลยข้อที่ 3','A=4, C=1, K=3, I=5, B=2, M=6\n\n5/6 = 2/4 + 1/3\n\n0.8333... = 0.5 + 0.3333...'); }
+  function reset() { clearInputs(prefix,keys); document.getElementById('prev3').textContent=''; step=0; }
+
+  return { preview, check, hint, reveal, reset };
+})();
+
+// ── Q4: D/O + N/T = P/E + R/I + S/H, digits 0-9 ─────────────────
+// Answer: D=5,O=6,N=0,T=7,P=1,E=4,R=2,I=8,S=3,H=9
+const Q4 = (() => {
+  const prefix = 'q4', keys = ['D','O','N','T','P','E','R','I','S','H'];
+  const hints = [
+    "ลองให้ N=0 เพื่อให้ N/T = 0 ตัดออกไปได้เลย",
+    "ถ้า N=0 แล้ว D/O ต้องเท่ากับ P/E + R/I + S/H",
+    "ลองให้ D=5, O=6 จะได้ D/O = 5/6 ≈ 0.8333",
+    "เฉลย: D=5,O=6,N=0,T=7,P=1,E=4,R=2,I=8,S=3,H=9",
+  ];
+  let step = 0;
+
+  function preview() {
+    const v = getVals(prefix, keys);
+    const el = document.getElementById('prev4');
+    if (keys.some(k=>isNaN(v[k]))) { el.textContent=''; return; }
+    const lhs = v.D/v.O + v.N/v.T, rhs = v.P/v.E + v.R/v.I + v.S/v.H;
+    el.textContent = `${v.D}/${v.O}+${v.N}/${v.T} = ${lhs.toFixed(4)}   |   ${v.P}/${v.E}+${v.R}/${v.I}+${v.S}/${v.H} = ${rhs.toFixed(4)}`;
+  }
+
+  function check() {
+    const v = getVals(prefix, keys);
+    clearInputs(prefix, keys);
+    if (keys.some(k=>isNaN(v[k]))) { showModal('error','กรอกให้ครบ',''); return; }
+    if (keys.some(k=>v[k]<0||v[k]>9)) { showModal('error','ใช้ตัวเลข 0–9 เท่านั้น',''); return; }
+    if (new Set(keys.map(k=>v[k])).size!==10) { showModal('error','ตัวเลขห้ามซ้ำกัน',''); return; }
+    if ([v.O,v.T,v.E,v.I,v.H].some(x=>x===0)) { showModal('error','ตัวหาร O,T,E,I,H ห้ามเป็น 0',''); return; }
+    const lhs = v.D/v.O + v.N/v.T, rhs = v.P/v.E + v.R/v.I + v.S/v.H;
+    const ok = Math.abs(lhs-rhs) < 1e-9;
+    if (ok) {
+      markInputs(prefix,keys,'correct');
+      showModal('success','ถูกต้อง',`${v.D}/${v.O} + ${v.N}/${v.T} = ${v.P}/${v.E} + ${v.R}/${v.I} + ${v.S}/${v.H}\n${lhs.toFixed(6)} = ${rhs.toFixed(6)}`);
+      launchConfetti(); step=0;
+    } else {
+      markInputs(prefix,keys,'wrong');
+      showModal('error','ยังไม่ถูก',
+        `ฝั่งซ้าย: ${v.D}/${v.O} + ${v.N}/${v.T} = ${lhs.toFixed(6)}\nฝั่งขวา: ${v.P}/${v.E} + ${v.R}/${v.I} + ${v.S}/${v.H} = ${rhs.toFixed(6)}\n${lhs.toFixed(6)} ≠ ${rhs.toFixed(6)}`);
+    }
+  }
+
+  function hint() { showModal('hint','คำใบ้',hints[Math.min(step,hints.length-1)]); step=Math.min(step+1,hints.length-1); }
+  function reveal() { showModal('answer','เฉลยข้อที่ 4','D=5, O=6, N=0, T=7\nP=1, E=4, R=2, I=8, S=3, H=9\n\n5/6 + 0/7 = 1/4 + 2/8 + 3/9\n0.8333... = 0.25 + 0.25 + 0.3333...'); }
+  function reset() { clearInputs(prefix,keys); document.getElementById('prev4').textContent=''; step=0; }
+
+  return { preview, check, hint, reveal, reset };
+})();

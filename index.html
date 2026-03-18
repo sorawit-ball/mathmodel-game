@@ -3,92 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cryptarithm — ACK.IBM</title>
+<title>Cryptarithm Puzzles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=Space+Grotesk:wght@400;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <canvas id="confetti"></canvas>
 
+<!-- Q1 -->
 <div class="container">
   <div class="header">
     <div class="badge">CRYPTARITHM</div>
     <div class="question-number">ข้อที่ 1</div>
-    <p class="subtitle">จงเติมตัวเลขและคำนวณให้ผลลัพธ์ตรงกับโจทย์ข้างบน</p>
-    <h1>ACK.IBM</h1>
+    <p class="subtitle">จงหาค่า A, B, C, D ที่ทำให้สมการเป็นจริง</p>
+    <h1>AB.CD</h1>
   </div>
-
   <div class="equation-box">
-    <div class="fraction">
-      <span class="num"><span class="letter">I</span></span>
-      <span class="bar"></span>
-      <span class="den"><span class="letter">M</span></span>
-    </div>
+    <div class="fraction"><span class="num"><span class="letter">A</span></span><span class="bar"></span><span class="den"><span class="letter">B</span></span></div>
     <span class="op">=</span>
-    <div class="fraction">
-      <span class="num"><span class="letter">B</span></span>
-      <span class="bar"></span>
-      <span class="den"><span class="letter">A</span></span>
-    </div>
-    <span class="op">+</span>
-    <div class="fraction">
-      <span class="num"><span class="letter">C</span></span>
-      <span class="bar"></span>
-      <span class="den"><span class="letter">K</span></span>
-    </div>
+    <div class="fraction"><span class="num"><span class="letter">C</span></span><span class="bar"></span><span class="den"><span class="letter">D</span></span></div>
   </div>
-
-  <div class="rule-box">
-    <div>
-      ใช้ตัวเลข <strong>1 ถึง 6</strong> แทน A, C, K, I, B, M &nbsp;·&nbsp; ตัวเลขแต่ละตัว <strong>ห้ามซ้ำกัน</strong>
-    </div>
+  <div class="rule-box">ใช้ตัวเลข <strong>1–6</strong> แทน A, B, C, D &nbsp;·&nbsp; ห้ามซ้ำกัน &nbsp;·&nbsp; A/B = C/D</div>
+  <div class="inputs-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="input-group"><label><span class="letter-label">A</span></label><input type="number" id="q1-A" min="1" max="6" placeholder="?" oninput="Q1.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">B</span></label><input type="number" id="q1-B" min="1" max="6" placeholder="?" oninput="Q1.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">C</span></label><input type="number" id="q1-C" min="1" max="6" placeholder="?" oninput="Q1.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">D</span></label><input type="number" id="q1-D" min="1" max="6" placeholder="?" oninput="Q1.preview()"></div>
   </div>
-
-  <div class="inputs-grid">
-    <div class="input-group">
-      <label><span class="letter-label">A</span></label>
-      <input type="number" id="inp-A" min="1" max="6" placeholder="?" oninput="onInput()">
-    </div>
-    <div class="input-group">
-      <label><span class="letter-label">C</span></label>
-      <input type="number" id="inp-C" min="1" max="6" placeholder="?" oninput="onInput()">
-    </div>
-    <div class="input-group">
-      <label><span class="letter-label">K</span></label>
-      <input type="number" id="inp-K" min="1" max="6" placeholder="?" oninput="onInput()">
-    </div>
-    <div class="input-group">
-      <label><span class="letter-label">I</span></label>
-      <input type="number" id="inp-I" min="1" max="6" placeholder="?" oninput="onInput()">
-    </div>
-    <div class="input-group">
-      <label><span class="letter-label">B</span></label>
-      <input type="number" id="inp-B" min="1" max="6" placeholder="?" oninput="onInput()">
-    </div>
-    <div class="input-group">
-      <label><span class="letter-label">M</span></label>
-      <input type="number" id="inp-M" min="1" max="6" placeholder="?" oninput="onInput()">
-    </div>
-  </div>
-
-  <div class="preview-row" id="preview"></div>
-
+  <div class="preview-row" id="prev1"></div>
   <div class="btn-row">
-    <button class="btn-reset" onclick="resetGame()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
-      รีเซ็ต
-    </button>
-    <button class="btn-hint" onclick="giveHint()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      คำใบ้
-    </button>
-    <button class="btn-check" onclick="checkAnswer()">
-      ตรวจคำตอบ
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    </button>
+    <button class="btn-reset" onclick="Q1.reset()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>รีเซ็ต</button>
+    <button class="btn-hint"  onclick="Q1.hint()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>คำใบ้</button>
+    <button class="btn-answer" onclick="Q1.reveal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>เฉลย</button>
+    <button class="btn-check"  onclick="Q1.check()">ตรวจคำตอบ<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
   </div>
 </div>
 
-<!-- Result Modal -->
+<!-- Q2 -->
+<div class="container">
+  <div class="header">
+    <div class="badge">CRYPTARITHM</div>
+    <div class="question-number">ข้อที่ 2</div>
+    <p class="subtitle">จงหาค่า A, B, C, D, E, F ที่ทำให้สมการเป็นจริง</p>
+    <h1>ABC.DEF</h1>
+  </div>
+  <div class="equation-box">
+    <div class="fraction"><span class="num"><span class="letter">A</span></span><span class="bar"></span><span class="den"><span class="letter">B</span></span></div>
+    <span class="op">+</span>
+    <div class="fraction"><span class="num"><span class="letter">C</span></span><span class="bar"></span><span class="den"><span class="letter">D</span></span></div>
+    <span class="op">=</span>
+    <div class="fraction"><span class="num"><span class="letter">E</span></span><span class="bar"></span><span class="den"><span class="letter">F</span></span></div>
+  </div>
+  <div class="rule-box">ใช้ตัวเลข <strong>1–6</strong> แทน A–F &nbsp;·&nbsp; ห้ามซ้ำกัน &nbsp;·&nbsp; A/B + C/D = E/F</div>
+  <div class="inputs-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="input-group"><label><span class="letter-label">A</span></label><input type="number" id="q2-A" min="1" max="6" placeholder="?" oninput="Q2.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">B</span></label><input type="number" id="q2-B" min="1" max="6" placeholder="?" oninput="Q2.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">C</span></label><input type="number" id="q2-C" min="1" max="6" placeholder="?" oninput="Q2.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">D</span></label><input type="number" id="q2-D" min="1" max="6" placeholder="?" oninput="Q2.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">E</span></label><input type="number" id="q2-E" min="1" max="6" placeholder="?" oninput="Q2.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">F</span></label><input type="number" id="q2-F" min="1" max="6" placeholder="?" oninput="Q2.preview()"></div>
+  </div>
+  <div class="preview-row" id="prev2"></div>
+  <div class="btn-row">
+    <button class="btn-reset"  onclick="Q2.reset()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>รีเซ็ต</button>
+    <button class="btn-hint"   onclick="Q2.hint()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>คำใบ้</button>
+    <button class="btn-answer" onclick="Q2.reveal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>เฉลย</button>
+    <button class="btn-check"  onclick="Q2.check()">ตรวจคำตอบ<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="container">
+  <div class="header">
+    <div class="badge">CRYPTARITHM</div>
+    <div class="question-number">ข้อที่ 3</div>
+    <p class="subtitle">จงหาค่า A, C, K, I, B, M ที่ทำให้สมการเป็นจริง</p>
+    <h1>ACK.IBM</h1>
+  </div>
+  <div class="equation-box">
+    <div class="fraction"><span class="num"><span class="letter">I</span></span><span class="bar"></span><span class="den"><span class="letter">M</span></span></div>
+    <span class="op">=</span>
+    <div class="fraction"><span class="num"><span class="letter">B</span></span><span class="bar"></span><span class="den"><span class="letter">A</span></span></div>
+    <span class="op">+</span>
+    <div class="fraction"><span class="num"><span class="letter">C</span></span><span class="bar"></span><span class="den"><span class="letter">K</span></span></div>
+  </div>
+  <div class="rule-box">ใช้ตัวเลข <strong>1–6</strong> แทน A, C, K, I, B, M &nbsp;·&nbsp; ห้ามซ้ำกัน</div>
+  <div class="inputs-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="input-group"><label><span class="letter-label">A</span></label><input type="number" id="q3-A" min="1" max="6" placeholder="?" oninput="Q3.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">C</span></label><input type="number" id="q3-C" min="1" max="6" placeholder="?" oninput="Q3.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">K</span></label><input type="number" id="q3-K" min="1" max="6" placeholder="?" oninput="Q3.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">I</span></label><input type="number" id="q3-I" min="1" max="6" placeholder="?" oninput="Q3.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">B</span></label><input type="number" id="q3-B" min="1" max="6" placeholder="?" oninput="Q3.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">M</span></label><input type="number" id="q3-M" min="1" max="6" placeholder="?" oninput="Q3.preview()"></div>
+  </div>
+  <div class="preview-row" id="prev3"></div>
+  <div class="btn-row">
+    <button class="btn-reset"  onclick="Q3.reset()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>รีเซ็ต</button>
+    <button class="btn-hint"   onclick="Q3.hint()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>คำใบ้</button>
+    <button class="btn-answer" onclick="Q3.reveal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>เฉลย</button>
+    <button class="btn-check"  onclick="Q3.check()">ตรวจคำตอบ<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="container">
+  <div class="header">
+    <div class="badge">CRYPTARITHM</div>
+    <div class="question-number">ข้อที่ 4</div>
+    <p class="subtitle">จงหาค่า D,O,N,T,P,E,R,I,S,H ที่ทำให้สมการเป็นจริง</p>
+    <h1>DONT.PERISH</h1>
+  </div>
+  <div class="equation-box" style="gap:10px;flex-wrap:wrap">
+    <div class="fraction"><span class="num"><span class="letter">D</span></span><span class="bar"></span><span class="den"><span class="letter">O</span></span></div>
+    <span class="op">+</span>
+    <div class="fraction"><span class="num"><span class="letter">N</span></span><span class="bar"></span><span class="den"><span class="letter">T</span></span></div>
+    <span class="op">=</span>
+    <div class="fraction"><span class="num"><span class="letter">P</span></span><span class="bar"></span><span class="den"><span class="letter">E</span></span></div>
+    <span class="op">+</span>
+    <div class="fraction"><span class="num"><span class="letter">R</span></span><span class="bar"></span><span class="den"><span class="letter">I</span></span></div>
+    <span class="op">+</span>
+    <div class="fraction"><span class="num"><span class="letter">S</span></span><span class="bar"></span><span class="den"><span class="letter">H</span></span></div>
+  </div>
+  <div class="rule-box">ใช้ตัวเลข <strong>0–9</strong> แทน D,O,N,T,P,E,R,I,S,H &nbsp;·&nbsp; ห้ามซ้ำกัน &nbsp;·&nbsp; ตัวหารห้ามเป็น 0</div>
+  <div class="inputs-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="input-group"><label><span class="letter-label">D</span></label><input type="number" id="q4-D" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">O</span></label><input type="number" id="q4-O" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">N</span></label><input type="number" id="q4-N" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">T</span></label><input type="number" id="q4-T" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">P</span></label><input type="number" id="q4-P" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">E</span></label><input type="number" id="q4-E" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">R</span></label><input type="number" id="q4-R" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">I</span></label><input type="number" id="q4-I" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">S</span></label><input type="number" id="q4-S" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+    <div class="input-group"><label><span class="letter-label">H</span></label><input type="number" id="q4-H" min="0" max="9" placeholder="?" oninput="Q4.preview()"></div>
+  </div>
+  <div class="preview-row" id="prev4"></div>
+  <div class="btn-row">
+    <button class="btn-reset"  onclick="Q4.reset()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>รีเซ็ต</button>
+    <button class="btn-hint"   onclick="Q4.hint()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>คำใบ้</button>
+    <button class="btn-answer" onclick="Q4.reveal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>เฉลย</button>
+    <button class="btn-check"  onclick="Q4.check()">ตรวจคำตอบ<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+  </div>
+</div>
+
+<!-- Modal -->
 <div class="modal-overlay" id="modal" onclick="closeModal(event)">
   <div class="modal-box" id="modal-box">
     <div class="modal-icon" id="modal-icon"></div>
