@@ -56,16 +56,15 @@ function launchConfetti() {
   draw();
 }
 
-// ── Q1: A/B = C/D, digits 1-6, answer: A=2,B=3,C=4,D=6 ─────────
-// 2/3 = 4/6 ✓
+// ── Q1: B/E = A/T, digits 1-6, answer: B=2,E=3,A=4,T=6 ─────────
+// 2/3 = 4/6 ✓  — word: BE.AT
 const Q1 = (() => {
-  const prefix = 'q1', keys = ['A','B','C','D'];
-  const answer = {A:2,B:3,C:4,D:6};
+  const prefix = 'q1', keys = ['B','E','A','T'];
   const hints = [
-    "A/B = C/D หมายความว่าเศษส่วนทั้งสองต้องเท่ากัน",
-    "ลองคิดว่าเศษส่วนไหนที่เท่ากันได้ เช่น 1/2 = 2/4",
+    "B/E = A/T หมายความว่าเศษส่วนทั้งสองต้องเท่ากัน",
+    "ลองคิดว่าเศษส่วนคู่ไหนเท่ากันได้ เช่น 1/2 = 2/4 หรือ 2/3 = 4/6",
     "ตัวเลขที่ใช้ต้องอยู่ใน 1–6 และห้ามซ้ำกัน",
-    "เฉลย: A=2, B=3, C=4, D=6 → 2/3 = 4/6",
+    "เฉลย: B=2, E=3, A=4, T=6 → 2/3 = 4/6",
   ];
   let step = 0;
 
@@ -73,7 +72,7 @@ const Q1 = (() => {
     const v = getVals(prefix, keys);
     const el = document.getElementById('prev1');
     if (keys.some(k=>isNaN(v[k]))) { el.textContent=''; return; }
-    el.textContent = `${v.A}/${v.B} = ${(v.A/v.B).toFixed(4)}   |   ${v.C}/${v.D} = ${(v.C/v.D).toFixed(4)}`;
+    el.textContent = `${v.B}/${v.E} = ${(v.B/v.E).toFixed(4)}   |   ${v.A}/${v.T} = ${(v.A/v.T).toFixed(4)}`;
   }
 
   function check() {
@@ -82,34 +81,33 @@ const Q1 = (() => {
     if (keys.some(k=>isNaN(v[k]))) { showModal('error','กรอกให้ครบ',''); return; }
     if (keys.some(k=>v[k]<1||v[k]>6)) { showModal('error','ใช้ตัวเลข 1–6 เท่านั้น',''); return; }
     if (new Set(keys.map(k=>v[k])).size!==4) { showModal('error','ตัวเลขห้ามซ้ำกัน',''); return; }
-    const ok = Math.abs(v.A/v.B - v.C/v.D) < 1e-9;
+    const ok = Math.abs(v.B/v.E - v.A/v.T) < 1e-9;
     if (ok) {
       markInputs(prefix,keys,'correct');
-      showModal('success','ถูกต้อง',`${v.A}/${v.B} = ${v.C}/${v.D} = ${fracStr(v.A,v.B)}`);
+      showModal('success','ถูกต้อง',`${v.B}/${v.E} = ${v.A}/${v.T} = ${fracStr(v.B,v.E)}`);
       launchConfetti(); step=0;
     } else {
       markInputs(prefix,keys,'wrong');
-      showModal('error','ยังไม่ถูก',`${v.A}/${v.B} = ${fracStr(v.A,v.B)}\n${v.C}/${v.D} = ${fracStr(v.C,v.D)}\n${fracStr(v.A,v.B)} ≠ ${fracStr(v.C,v.D)}`);
+      showModal('error','ยังไม่ถูก',`${v.B}/${v.E} = ${fracStr(v.B,v.E)}\n${v.A}/${v.T} = ${fracStr(v.A,v.T)}\n${fracStr(v.B,v.E)} ≠ ${fracStr(v.A,v.T)}`);
     }
   }
 
   function hint() { showModal('hint','คำใบ้',hints[Math.min(step,hints.length-1)]); step=Math.min(step+1,hints.length-1); }
-  function reveal() { showModal('answer','เฉลยข้อที่ 1','A=2, B=3, C=4, D=6\n\n2/3 = 4/6\n\nทั้งสองเศษส่วนเท่ากับ 2/3'); }
+  function reveal() { showModal('answer','เฉลยข้อที่ 1','B=2, E=3, A=4, T=6\n\n2/3 = 4/6\n\nทั้งสองเศษส่วนเท่ากับ 2/3'); }
   function reset() { clearInputs(prefix,keys); document.getElementById('prev1').textContent=''; step=0; }
 
   return { preview, check, hint, reveal, reset };
 })();
 
-// ── Q2: A/B + C/D = E/F, digits 1-6, answer: A=1,B=2,C=5,D=6,E=4,F=3 ──
-// 1/2 + 5/6 = 4/3 ✓  (0.5 + 0.8333 = 1.3333)
+// ── Q2: S/U + N/R = A/Y, digits 1-6, answer: S=1,U=2,N=5,R=6,A=4,Y=3 ──
+// 1/2 + 5/6 = 4/3 ✓  — word: SUN.RAY
 const Q2 = (() => {
-  const prefix = 'q2', keys = ['A','B','C','D','E','F'];
-  const answer = {A:1,B:2,C:5,D:6,E:4,F:3};
+  const prefix = 'q2', keys = ['S','U','N','R','A','Y'];
   const hints = [
-    "ผลรวม A/B + C/D ต้องมากกว่า 1 เพราะ E/F > 1",
-    "ลองให้ B และ D เป็นตัวเลขที่บวกกันแล้วได้ลงตัว",
-    "ลองให้ B=2, D=6 แล้วหาค่า A, C ที่เหมาะสม",
-    "เฉลย: A=1, B=2, C=5, D=6, E=4, F=3 → 1/2 + 5/6 = 4/3",
+    "ผลรวม S/U + N/R ต้องมากกว่า 1 เพราะ A/Y > 1",
+    "ลองให้ U=2 และ R=6 แล้วหาค่า S, N ที่เหมาะสม",
+    "ถ้า S=1, U=2 จะได้ S/U = 1/2 แล้วหา N/R ที่เหลือ",
+    "เฉลย: S=1, U=2, N=5, R=6, A=4, Y=3 → 1/2 + 5/6 = 4/3",
   ];
   let step = 0;
 
@@ -117,8 +115,8 @@ const Q2 = (() => {
     const v = getVals(prefix, keys);
     const el = document.getElementById('prev2');
     if (keys.some(k=>isNaN(v[k]))) { el.textContent=''; return; }
-    const lhs = v.A/v.B + v.C/v.D;
-    el.textContent = `${v.A}/${v.B} + ${v.C}/${v.D} = ${lhs.toFixed(4)}   |   ${v.E}/${v.F} = ${(v.E/v.F).toFixed(4)}`;
+    const lhs = v.S/v.U + v.N/v.R;
+    el.textContent = `${v.S}/${v.U} + ${v.N}/${v.R} = ${lhs.toFixed(4)}   |   ${v.A}/${v.Y} = ${(v.A/v.Y).toFixed(4)}`;
   }
 
   function check() {
@@ -127,23 +125,22 @@ const Q2 = (() => {
     if (keys.some(k=>isNaN(v[k]))) { showModal('error','กรอกให้ครบ',''); return; }
     if (keys.some(k=>v[k]<1||v[k]>6)) { showModal('error','ใช้ตัวเลข 1–6 เท่านั้น',''); return; }
     if (new Set(keys.map(k=>v[k])).size!==6) { showModal('error','ตัวเลขห้ามซ้ำกัน',''); return; }
-    const lhs = v.A/v.B + v.C/v.D;
-    const rhs = v.E/v.F;
+    const lhs = v.S/v.U + v.N/v.R, rhs = v.A/v.Y;
     const ok = Math.abs(lhs - rhs) < 1e-9;
     if (ok) {
       markInputs(prefix,keys,'correct');
-      showModal('success','ถูกต้อง',`${v.A}/${v.B} + ${v.C}/${v.D} = ${v.E}/${v.F}\n${lhs.toFixed(4)} = ${rhs.toFixed(4)}`);
+      showModal('success','ถูกต้อง',`${v.S}/${v.U} + ${v.N}/${v.R} = ${v.A}/${v.Y}\n${lhs.toFixed(4)} = ${rhs.toFixed(4)}`);
       launchConfetti(); step=0;
     } else {
       markInputs(prefix,keys,'wrong');
-      const rhsN=v.A*v.D+v.C*v.B, rhsD=v.B*v.D;
+      const rhsN=v.S*v.R+v.N*v.U, rhsD=v.U*v.R;
       showModal('error','ยังไม่ถูก',
-        `ฝั่งซ้าย: ${v.A}/${v.B} + ${v.C}/${v.D} = ${fracStr(rhsN,rhsD)}\nฝั่งขวา: ${v.E}/${v.F} = ${fracStr(v.E,v.F)}\n${fracStr(rhsN,rhsD)} ≠ ${fracStr(v.E,v.F)}`);
+        `ฝั่งซ้าย: ${v.S}/${v.U} + ${v.N}/${v.R} = ${fracStr(rhsN,rhsD)}\nฝั่งขวา: ${v.A}/${v.Y} = ${fracStr(v.A,v.Y)}\n${fracStr(rhsN,rhsD)} ≠ ${fracStr(v.A,v.Y)}`);
     }
   }
 
   function hint() { showModal('hint','คำใบ้',hints[Math.min(step,hints.length-1)]); step=Math.min(step+1,hints.length-1); }
-  function reveal() { showModal('answer','เฉลยข้อที่ 2','A=1, B=2, C=5, D=6, E=4, F=3\n\n1/2 + 5/6 = 4/3\n\n0.5 + 0.8333... = 1.3333...'); }
+  function reveal() { showModal('answer','เฉลยข้อที่ 2','S=1, U=2, N=5, R=6, A=4, Y=3\n\n1/2 + 5/6 = 4/3\n\n0.5 + 0.8333... = 1.3333...'); }
   function reset() { clearInputs(prefix,keys); document.getElementById('prev2').textContent=''; step=0; }
 
   return { preview, check, hint, reveal, reset };
